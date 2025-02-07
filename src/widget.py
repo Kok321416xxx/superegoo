@@ -17,3 +17,4 @@ def get_date(iso_date_str: str) -> str:
     year, month, day = date_part.split('-')
     result = f"{day}.{month}.{year}"
     return result
+
