@@ -2,6 +2,7 @@ import pytest
 from src.masks import get_mask_card_number, get_mask_account
 from src.widget import mask_account_card, get_date
 from src.processing import filter_by_state, sort_by_date
+from src.generators import card_number_generator, transaction_descriptions
 
 
 def test_assert_get_mask_card_number(fixture_get_mask_card_number):
@@ -96,3 +97,83 @@ def test_sorted_date(sample_data):
     ]
     actual_result = sort_by_date(sample_data)
     assert actual_result == expected_result
+
+
+@pytest.mark.parametrize('start, end, expected', [(1, 3, ["0000 0000 0000 0001", "0000 0000 0000 0002", "0000 0000 0000 0003"])])
+def test_card_number_generator(start, end, expected):
+    assert list(card_number_generator(start, end)) == expected
+
+
+@pytest.mark.parametrize("expected", [['Перевод организации', 'Перевод со счета на счет']])
+def test_transaction_descriptions(transactions, expected):
+    assert list(transaction_descriptions(transactions)) == expected
+
+
+@pytest.mark.parametrize('transaction, expected', [
+    (
+        {
+            "id": 939719570,
+            "state": "EXECUTED",
+            "date": "2018-06-30T02:08:58.425572",
+            "operationAmount": {
+                "amount": "9824.07",
+                "currency": {
+                    "name": "USD",
+                    "code": "USD"
+                }
+            },
+            "description": "Перевод организации",
+            "from": "Счет 75106830613657916952",
+            "to": "Счет 11776614605963066702"
+        },
+        {
+            "id": 939719570,
+            "state": "EXECUTED",
+            "date": "2018-06-30T02:08:58.425572",
+            "operationAmount": {
+                "amount": "9824.07",
+                "currency": {
+                    "name": "USD",
+                    "code": "USD"
+                }
+            },
+            "description": "Перевод организации",
+            "from": "Счет 75106830613657916952",
+            "to": "Счет 11776614605963066702"
+        }
+    ),
+    (
+        {
+            "id": 142264268,
+            "state": "EXECUTED",
+            "date": "2019-04-04T23:20:05.206878",
+            "operationAmount": {
+                "amount": "79114.93",
+                "currency": {
+                    "name": "USD",
+                    "code": "USD"
+                }
+            },
+            "description": "Перевод со счета на счет",
+            "from": "Счет 19708645243227258542",
+            "to": "Счет 75651667383060284188"
+        },
+        {
+            "id": 142264268,
+            "state": "EXECUTED",
+            "date": "2019-04-04T23:20:05.206878",
+            "operationAmount": {
+                "amount": "79114.93",
+                "currency": {
+                    "name": "USD",
+                    "code": "USD"
+                }
+            },
+            "description": "Перевод со счета на счет",
+            "from": "Счет 19708645243227258542",
+            "to": "Счет 75651667383060284188"
+        }
+    )
+])
+def test_transaction(transaction, expected):
+    assert transaction == expected
