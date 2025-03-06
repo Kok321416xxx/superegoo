@@ -3,6 +3,7 @@ from src.masks import get_mask_card_number, get_mask_account
 from src.widget import mask_account_card, get_date
 from src.processing import filter_by_state, sort_by_date
 from src.generators import card_number_generator, transaction_descriptions
+from src.decorators import log
 
 
 def test_assert_get_mask_card_number(fixture_get_mask_card_number):
@@ -164,3 +165,47 @@ def test_transaction_descriptions(transactions, expected):
 )
 def test_transaction(transaction, expected):
     assert transaction == expected
+
+
+def test_log_decorator_err(capsys):
+    @log()
+    def simpl_add(x, y):
+        return x + y
+
+    with pytest.raises(TypeError):
+        simpl_add(1, "2")
+    masage = capsys.readouterr()
+    assert "simpl_add, TypeError, (1, '2'), {} not ok\n" in masage.out
+
+
+def test_log_decorator(capsys):
+    @log()
+    def simpl_add(x, y):
+        return x + y
+
+    simpl_add(1, 2)
+    masage = capsys.readouterr()
+    assert "simpl_add status ok\n" in masage.out
+
+
+def test_open_file():
+    @log(filename="log_test_file.txt")
+    def simpl_add(x, y):
+        return x + y
+    simpl_add(1, 2)
+    with open("log_test_file.txt", "r", encoding="utf-8") as file:
+        lines = file.readlines()
+        massage = lines[-1]
+        assert massage == "simpl_add status ok\n"
+
+
+def test_open_file_not_ok():
+    with pytest.raises(TypeError):
+        @log(filename="log_test_file.txt")
+        def simpl_add(x, y):
+            return x + y
+        simpl_add(1, "2")
+        with open("log_test_file.txt", "r", encoding="utf-8") as file:
+            lines = file.readlines()
+            massage = lines[-1]
+            assert massage == "simpl_add, TypeError, (1, '2'), {} not ok"

@@ -1,3 +1,6 @@
+from src.decorators import log
+
+@log("log_test_file")
 def get_mask_card_number(num_card: str) -> str:
     if len(num_card) != 16:
         raise ValueError("Некорректная длинна номера")
