@@ -1,9 +1,16 @@
+from pathlib import Path
+from unittest import mock
+from unittest.mock import patch, mock_open
+
 import pytest
-from src.masks import get_mask_card_number, get_mask_account
-from src.widget import mask_account_card, get_date
-from src.processing import filter_by_state, sort_by_date
-from src.generators import card_number_generator, transaction_descriptions
+
 from src.decorators import log
+from src.external_api import convert_currency
+from src.generators import card_number_generator, transaction_descriptions
+from src.masks import get_mask_card_number, get_mask_account
+from src.processing import filter_by_state, sort_by_date
+from src.utils import fin_transaction
+from src.widget import mask_account_card, get_date
 
 
 def test_assert_get_mask_card_number(fixture_get_mask_card_number):
@@ -192,6 +199,7 @@ def test_open_file():
     @log(filename="log_test_file.txt")
     def simpl_add(x, y):
         return x + y
+
     simpl_add(1, 2)
     with open("log_test_file.txt", "r", encoding="utf-8") as file:
         lines = file.readlines()
@@ -201,11 +209,44 @@ def test_open_file():
 
 def test_open_file_not_ok():
     with pytest.raises(TypeError):
+
         @log(filename="log_test_file.txt")
         def simpl_add(x, y):
             return x + y
+
         simpl_add(1, "2")
         with open("log_test_file.txt", "r", encoding="utf-8") as file:
             lines = file.readlines()
             massage = lines[-1]
             assert massage == "simpl_add, TypeError, (1, '2'), {} not ok"
+
+
+def test_conver_currency():
+    with mock.patch("src.external_api.requests.get") as mock_get:
+        mock_response = mock.Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"result": 100.0}
+        mock_get.return_value = mock_response
+        result = convert_currency(100, "USD")
+        # Проверяем результат
+        assert result == 100.0
+
+
+def test_fin_transaction_file_not_found(mock_path):
+    """Тест отсутствия файла."""
+    # Патчим существование файла
+    with patch.object(Path, "exists", return_value=False):
+        # Вызываем функцию
+        result = fin_transaction(mock_path)
+    # Проверяем результат
+    assert result == {}
+
+
+def test_fin_transaction_success(mock_path):
+    """Тест успешного парсинга JSON-файла."""
+    # Мокируем содержимое файла
+    mock_data = '{"key": "value"}'
+    m = mock_open(read_data=mock_data)
+    with patch("builtins.open", m):
+        result = fin_transaction(mock_path)
+    assert result == {"key": "value"}

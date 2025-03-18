@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 
 
@@ -45,5 +47,7 @@ def transactions():
     ]
 
 
-
-
+@pytest.fixture
+def mock_path():
+    """Фиктивный путь к файлу"""
+    return Path("/data_a/operations_s.json")
