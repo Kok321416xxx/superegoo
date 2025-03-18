@@ -1,2 +1,0 @@
-simpl_add status ok
-simpl_add, TypeError, (1, '2'), {} not ok
