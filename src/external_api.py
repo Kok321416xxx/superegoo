@@ -30,11 +30,22 @@ def convert_currency(amount: str, from_curency: str) -> float:
     нужно было делать через try и exept, но как успел, может потом переделаю
     """
     headers = {"apikey": API_KEY}
-    response = requests.get(URL.format(to="RUB", fromm_v=from_curency, amount=amount), headers=headers)
-    if response.status_code == 200:
+    try:
+        response = requests.get(URL.format(to="RUB", fromm_v=from_curency, amount=amount), headers=headers)
+        if response.status_code != 200:
+            raise ValueError(f"Не удалось получить курс валют. Код состояния: {response.status_code}")
         data = response.json()
         rate = data["result"]
         return float(rate)
+    except requests.exceptions.RequestException as e:
+        print(f"Произошла ошибка при выполнении запроса: {e}")
+        return None
+    except KeyError as e:
+        print(f"Ошибка при разборе JSON: ключ '{e}' не найден.")
+        return None
+    except ValueError as e:
+        print(f"Возникла ошибка: {e}")
+        return None
 
 
 transaction = {
