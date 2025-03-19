@@ -53,7 +53,12 @@
 Тестирование декоратора сделано через простенькую функцию (в test_all_ass)
 тестирование функций обрабоки json и других функций перевода валюты через API реализованы через Mock и patch
 
-##### Благодарности и тест ссылок
+##### Логеры
+
+- модуль masks (запуск через main, логирование начало функции с информацией)
+- модуль utils (логирование начала, отлов ошибок через переменную "е")
+
+###### Благодарности и тест ссылок
 
 [Спасибо скайпро, что обучает ](https://sky.pro/?utm_source=yandex&utm_medium=cpc&utm_campaign=n_brand_search_main_ru_yandex_93946323%7Cpl_search%7Cpr_171%7Cta_cold%7Cfu_main_landing%7Cma_academtraff%7Cown_b2c%7Cchg_performance&utm_content=ai_15317198706%7Cagi_5326320680%7Cci_93946323%7Cpi_48260074055%7Cse_none&utm_term=search%7Ckwd_---autotargeting=&roistat=direct1_search_15317198706_---autotargeting&roistat_referrer=none&roistat_pos=premium_1&yclid=9357941114785234943)
 

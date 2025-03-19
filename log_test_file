@@ -6,3 +6,11 @@ get_mask_card_number status ok
 get_mask_card_number status ok
 get_mask_card_number status ok
 get_mask_card_number status ok
+get_mask_card_number, TypeError, ('1234567890123456',), {} not ok
+get_mask_card_number status ok
+get_mask_card_number status ok
+get_mask_card_number status ok
+get_mask_card_number status ok
+get_mask_card_number status ok
+get_mask_card_number status ok
+get_mask_card_number status ok
