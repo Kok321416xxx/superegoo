@@ -1,4 +1,5 @@
 from pathlib import Path
+from unittest.mock import mock_open
 
 import pytest
 
@@ -51,3 +52,10 @@ def transactions():
 def mock_path():
     """Фиктивный путь к файлу"""
     return Path("/data_a/operations_s.json")
+
+
+@pytest.fixture
+def mock_csv_file():
+    """Фиктивное содержание CSV файла"""
+    content = b"id;state;date\n1;EXECUTED;2019-07-03T18:35:29.512364"
+    return mock_open(read_data=content.decode("utf-8"))

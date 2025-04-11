@@ -1,6 +1,8 @@
 import logging
 import os
 
+from src.generators import transactions
+
 log_directory = os.path.join(os.getcwd(), "logs")
 os.makedirs(log_directory, exist_ok=True)  # Создаем папку logs, если она еще не существует
 
@@ -14,7 +16,7 @@ logging.basicConfig(
 auth_logger_processing = logging.getLogger("app.auth")
 
 
-def filter_by_state(dict_for_state: list[dict], state: str = "EXECUTED") -> list[dict]:
+def filter_by_state(dict_for_state, state: str = "EXECUTED") -> list[dict]:
     """Принимает список словарей и возвращает словари, у которых ключ state соответствует указанному значению."""
     auth_logger_processing.info("Запуск функции")
     filtered_list = []
@@ -28,3 +30,6 @@ def sort_by_date(dict_sort_by_date: list[dict], reverse: bool = True) -> list[di
     """Принимает список словарей, возвращает новый список, отсортированный по дате (date)"""
     auth_logger_processing.info("Запуск функции")
     return sorted(dict_sort_by_date, key=lambda x: x.get("date"), reverse=reverse)
+
+
+print(filter_by_state(transactions))

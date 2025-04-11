@@ -103,6 +103,5 @@ def count_operations_by_description(operations: list[dict], categories_1: list[s
 
     return dict(category_counts)
 
-
-result = count_operations_by_description(o, categories)
-print(result)
+# result = count_operations_by_description(o, categories)
+# print(result)

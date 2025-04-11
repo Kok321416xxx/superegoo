@@ -31,12 +31,15 @@ def convert_currency(amount: str, from_curency: str) -> float:
     """
     headers = {"apikey": API_KEY}
     try:
-        response = requests.get(URL.format(to="RUB", fromm_v=from_curency, amount=amount), headers=headers)
-        if response.status_code != 200:
-            raise ValueError(f"Не удалось получить курс валют. Код состояния: {response.status_code}")
-        data = response.json()
-        rate = data["result"]
-        return float(rate)
+        if from_curency != "RUB":
+            response = requests.get(URL.format(to="RUB", fromm_v=from_curency, amount=amount), headers=headers)
+            if response.status_code != 200:
+                raise ValueError(f"Не удалось получить курс валют. Код состояния: {response.status_code}")
+            data = response.json()
+            rate = data["result"]
+            return float(rate)
+        else:
+            return amount
     except requests.exceptions.RequestException as e:
         print(f"Произошла ошибка при выполнении запроса: {e}")
         return None
@@ -57,4 +60,4 @@ transaction = {
     "from": "Счет 59956820797131895975",
     "to": "Счет 43475624104328495820",
 }
-print(get_transaction_amount_in_rubles(transaction))
+# print(get_transaction_amount_in_rubles(transaction))

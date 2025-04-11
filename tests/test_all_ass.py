@@ -1,7 +1,9 @@
 from pathlib import Path
 from unittest import mock
-from unittest.mock import patch, mock_open
+from unittest.mock import mock_open
+from unittest.mock import patch
 
+import pandas as pd
 import pytest
 
 from src.decorators import log
@@ -250,3 +252,112 @@ def test_fin_transaction_success(mock_path):
     with patch("builtins.open", m):
         result = fin_transaction(mock_path)
     assert result == {"key": "value"}
+
+
+def test_file_path_exel(mock_pandas_read_excel):
+    """Тестирует успешное чтение Excel файла"""
+    from src.reader_csv_exel_file import file_path_exel
+
+    expected_output = [
+        {"id": 1, "state": "EXECUTED", "date": "2019-07-03T18:35:29.512364"},
+        {"id": 2, "state": "CANCELED", "date": "2018-10-14T08:21:33.419441"},
+        {"id": 3, "state": "PENDING", "date": "2018-09-12T21:27:25.241689"},
+    ]
+    result = file_path_exel("../data/transactions_excel.xlsx")
+    assert result == expected_output
+    mock_pandas_read_excel.assert_called_once_with("../data/transactions_excel.xlsx")
+
+
+def test_file_not_found():
+    """Тестирует обработку отсутствующего файла"""
+    from src.reader_csv_exel_file import file_path_exel
+
+    with pytest.raises(FileNotFoundError):
+        file_path_exel("/path/to/nonexistent/file.xlsx")
+
+
+def test_general_exception_handling():
+    """Тестирует общую обработку исключений"""
+    from src.reader_csv_exel_file import file_path_exel
+
+    with patch("your_module.pd.read_excel", side_effect=Exception("Test exception")):
+        result = file_path_exel("../data/transactions_excel.xlsx")
+        assert result is None
+
+
+# Подключаем модуль, где находятся функции
+from src.reader_csv_exel_file import file_path_csv, file_path_exel
+
+
+# Фикстуры для теста CSV
+@pytest.fixture
+def mock_csv_file():
+    """Фиктивное содержание CSV файла"""
+    content = b"id;state;date\n1;EXECUTED;2019-07-03T18:35:29.512364"
+    return mock_open(read_data=content.decode("utf-8"))
+
+
+# Фикстуры для теста Excel
+@pytest.fixture
+def mock_excel_file():
+    """Фиктивные данные для Excel файла"""
+    mock_df = pd.DataFrame(
+        {
+            "id": [1, 2, 3],
+            "state": ["EXECUTED", "CANCELED", "PENDING"],
+            "date": ["2019-07-03T18:35:29.512364", "2018-10-14T08:21:33.419441", "2018-09-12T21:27:25.241689"],
+        }
+    )
+    return mock_df
+
+
+# Тесты для функции file_path_csv
+def test_file_path_csv(mock_csv_file):
+    """Тестирует успешное чтение CSV файла"""
+    with mock_csv_file() as m:
+        result = file_path_csv("../data/transactionscsv.csv")
+        expected_output = [{"id": "1", "state": "EXECUTED", "date": "2019-07-03T18:35:29.512364"}]
+        assert result == expected_output
+        m.assert_called_once_with("../data/transactionscsv.csv", "r", newline="", encoding="utf-8")
+
+
+def test_file_not_found_csv():
+    """Тестирует обработку отсутствующего CSV файла"""
+    with pytest.raises(FileNotFoundError):
+        file_path_csv("/path/to/nonexistent/file.csv")
+
+
+def test_general_exception_handling_csv():
+    """Тестирует общую обработку исключений при чтении CSV файла"""
+    with mock_open() as m:
+        m.side_effect = Exception("Test exception")
+        result = file_path_csv("../data/transactionscsv.csv")
+        assert result is None
+        m.assert_called_once_with("../data/transactionscsv.csv", "r", newline="", encoding="utf-8")
+
+
+# Тесты для функции file_path_exel
+def test_file_path_exel(mock_excel_file):
+    """Тестирует успешное чтение Excel файла"""
+    with patch("pandas.read_excel", return_value=mock_excel_file) as mock_read_excel:
+        expected_output = [
+            {"id": 1, "state": "EXECUTED", "date": "2019-07-03T18:35:29.512364"},
+            {"id": 2, "state": "CANCELED", "date": "2018-10-14T08:21:33.419441"},
+            {"id": 3, "state": "PENDING", "date": "2018-09-12T21:27:25.241689"},
+        ]
+        result = file_path_exel("../data/transactions_excel.xlsx")
+        assert result == expected_output
+        mock_read_excel.assert_called_once_with("../data/transactions_excel.xlsx")
+
+
+def test_file_not_found_exel():
+    """Тестирует обработку отсутствующего Excel файла"""
+    with pytest.raises(FileNotFoundError):
+        file_path_exel("/path/to/nonexistent/file.xlsx")
+
+
+def test_general_exception_handling_exel():
+    """Тестирует общую обработку исключений при чтении Excel файла"""
+    with patch("pandas.read_excel", side_effect=Exception("Test exception")):
+        result = file_path_exel("../data/transactions_excel.xlsx")
+        assert result is None
