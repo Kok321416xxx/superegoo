@@ -89,7 +89,7 @@ def count_operations_by_description(dickt_list_ex_cs_js: list[dict], find_str: s
     return finder_dickt
 
 
-def count_operations_by_description(operations: list[dict], categories_1: list[str]) -> dict:
+def count_operations_by_descriptions(operations: list[dict], categories_1: list[str]) -> dict:
     """
     Функция принимает список словарей с данными о банковских операциях и список категорий операций.
     Возвращает словарь, где ключи — это названия категорий, а значения — количество операций в каждой категории.

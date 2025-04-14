@@ -34,7 +34,8 @@ def main_logic():
     print("Программа: Привет! Добро пожаловать в программу работы с банковскими транзакциями. ")
     print(
         (
-            "Выберите необходимый пункт меню:\n1. Получить информацию о транзакциях из JSON-файла\n2. Получить информацию о транзакциях из CSV-файла\n3. Получить информацию о транзакциях из XLSX-файла"
+            "Выберите необходимый пункт меню:\n1. Получить информацию о транзакциях из JSON-файла\n2. Получить информацию о транзакциях из CSV-файла\n3."
+            "Получить информацию о транзакциях из XLSX-файла"
         )
     )
     s = input()
@@ -48,7 +49,7 @@ def main_logic():
         object_data = file_path_exel("data/transactions_excel.xlsx")
         print(object_data)
     else:
-        print(f"НЕТ ТАКОГО")
+        print("Данного файла нет")
     print(
         "Введите статус, по которому необходимо выполнить фильтрацию.\nДоступные для фильтровки статусы: EXECUTED, CANCELED, PENDING"
     )
@@ -56,7 +57,7 @@ def main_logic():
     user_status = input().lower()
     statuses = ["executed", "canceled", "pending"]
     if user_status in statuses:
-        object_data = filter_by_state(object_data, user_status)
+        object_data = filter_by_state(object_data, user_status.upper())
     else:
         print(f"Статус операции {user_status} недоступен. Попробуйте ещё раз.")
     print(f"Операции отфильтрованы по статусу {user_status}")

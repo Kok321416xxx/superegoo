@@ -11,6 +11,7 @@ from src.external_api import convert_currency
 from src.generators import card_number_generator, transaction_descriptions
 from src.masks import get_mask_card_number, get_mask_account
 from src.processing import filter_by_state, sort_by_date
+from src.reader_csv_exel_file import file_path_csv, file_path_exel
 from src.utils import fin_transaction
 from src.widget import mask_account_card, get_date
 
@@ -71,31 +72,31 @@ def test_get_date():
     [
         # Тест 1: Фильтрация по умолчанию (статус 'EXECUTED')
         (
-            [
-                {"id": 41428829, "state": "EXECUTED", "date": "2019-07-03T18:35:29.512364"},
-                {"id": 939719570, "state": "EXECUTED", "date": "2018-06-30T02:08:58.425572"},
-                {"id": 594226727, "state": "CANCELED", "date": "2018-09-12T21:27:25.241689"},
-                {"id": 615064591, "state": "CANCELED", "date": "2018-10-14T08:21:33.419441"},
-            ],
-            "EXECUTED",  # Статус для фильтрации
-            [
-                {"id": 41428829, "state": "EXECUTED", "date": "2019-07-03T18:35:29.512364"},
-                {"id": 939719570, "state": "EXECUTED", "date": "2018-06-30T02:08:58.425572"},
-            ],
+                [
+                    {"id": 41428829, "state": "EXECUTED", "date": "2019-07-03T18:35:29.512364"},
+                    {"id": 939719570, "state": "EXECUTED", "date": "2018-06-30T02:08:58.425572"},
+                    {"id": 594226727, "state": "CANCELED", "date": "2018-09-12T21:27:25.241689"},
+                    {"id": 615064591, "state": "CANCELED", "date": "2018-10-14T08:21:33.419441"},
+                ],
+                "EXECUTED",  # Статус для фильтрации
+                [
+                    {"id": 41428829, "state": "EXECUTED", "date": "2019-07-03T18:35:29.512364"},
+                    {"id": 939719570, "state": "EXECUTED", "date": "2018-06-30T02:08:58.425572"},
+                ],
         ),
         # Тест 2: Фильтрация по статусу 'CANCELED'
         (
-            [
-                {"id": 41428829, "state": "EXECUTED", "date": "2019-07-03T18:35:29.512364"},
-                {"id": 939719570, "state": "EXECUTED", "date": "2018-06-30T02:08:58.425572"},
-                {"id": 594226727, "state": "CANCELED", "date": "2018-09-12T21:27:25.241689"},
-                {"id": 615064591, "state": "CANCELED", "date": "2018-10-14T08:21:33.419441"},
-            ],
-            "CANCELED",  # Статус для фильтрации
-            [
-                {"id": 594226727, "state": "CANCELED", "date": "2018-09-12T21:27:25.241689"},
-                {"id": 615064591, "state": "CANCELED", "date": "2018-10-14T08:21:33.419441"},
-            ],
+                [
+                    {"id": 41428829, "state": "EXECUTED", "date": "2019-07-03T18:35:29.512364"},
+                    {"id": 939719570, "state": "EXECUTED", "date": "2018-06-30T02:08:58.425572"},
+                    {"id": 594226727, "state": "CANCELED", "date": "2018-09-12T21:27:25.241689"},
+                    {"id": 615064591, "state": "CANCELED", "date": "2018-10-14T08:21:33.419441"},
+                ],
+                "CANCELED",  # Статус для фильтрации
+                [
+                    {"id": 594226727, "state": "CANCELED", "date": "2018-09-12T21:27:25.241689"},
+                    {"id": 615064591, "state": "CANCELED", "date": "2018-10-14T08:21:33.419441"},
+                ],
         ),
     ],
 )
@@ -131,44 +132,44 @@ def test_transaction_descriptions(transactions, expected):
     "transaction, expected",
     [
         (
-            {
-                "id": 939719570,
-                "state": "EXECUTED",
-                "date": "2018-06-30T02:08:58.425572",
-                "operationAmount": {"amount": "9824.07", "currency": {"name": "USD", "code": "USD"}},
-                "description": "Перевод организации",
-                "from": "Счет 75106830613657916952",
-                "to": "Счет 11776614605963066702",
-            },
-            {
-                "id": 939719570,
-                "state": "EXECUTED",
-                "date": "2018-06-30T02:08:58.425572",
-                "operationAmount": {"amount": "9824.07", "currency": {"name": "USD", "code": "USD"}},
-                "description": "Перевод организации",
-                "from": "Счет 75106830613657916952",
-                "to": "Счет 11776614605963066702",
-            },
+                {
+                    "id": 939719570,
+                    "state": "EXECUTED",
+                    "date": "2018-06-30T02:08:58.425572",
+                    "operationAmount": {"amount": "9824.07", "currency": {"name": "USD", "code": "USD"}},
+                    "description": "Перевод организации",
+                    "from": "Счет 75106830613657916952",
+                    "to": "Счет 11776614605963066702",
+                },
+                {
+                    "id": 939719570,
+                    "state": "EXECUTED",
+                    "date": "2018-06-30T02:08:58.425572",
+                    "operationAmount": {"amount": "9824.07", "currency": {"name": "USD", "code": "USD"}},
+                    "description": "Перевод организации",
+                    "from": "Счет 75106830613657916952",
+                    "to": "Счет 11776614605963066702",
+                },
         ),
         (
-            {
-                "id": 142264268,
-                "state": "EXECUTED",
-                "date": "2019-04-04T23:20:05.206878",
-                "operationAmount": {"amount": "79114.93", "currency": {"name": "USD", "code": "USD"}},
-                "description": "Перевод со счета на счет",
-                "from": "Счет 19708645243227258542",
-                "to": "Счет 75651667383060284188",
-            },
-            {
-                "id": 142264268,
-                "state": "EXECUTED",
-                "date": "2019-04-04T23:20:05.206878",
-                "operationAmount": {"amount": "79114.93", "currency": {"name": "USD", "code": "USD"}},
-                "description": "Перевод со счета на счет",
-                "from": "Счет 19708645243227258542",
-                "to": "Счет 75651667383060284188",
-            },
+                {
+                    "id": 142264268,
+                    "state": "EXECUTED",
+                    "date": "2019-04-04T23:20:05.206878",
+                    "operationAmount": {"amount": "79114.93", "currency": {"name": "USD", "code": "USD"}},
+                    "description": "Перевод со счета на счет",
+                    "from": "Счет 19708645243227258542",
+                    "to": "Счет 75651667383060284188",
+                },
+                {
+                    "id": 142264268,
+                    "state": "EXECUTED",
+                    "date": "2019-04-04T23:20:05.206878",
+                    "operationAmount": {"amount": "79114.93", "currency": {"name": "USD", "code": "USD"}},
+                    "description": "Перевод со счета на счет",
+                    "from": "Счет 19708645243227258542",
+                    "to": "Счет 75651667383060284188",
+                },
         ),
     ],
 )
@@ -211,7 +212,6 @@ def test_open_file():
 
 def test_open_file_not_ok():
     with pytest.raises(TypeError):
-
         @log(filename="log_test_file.txt")
         def simpl_add(x, y):
             return x + y
@@ -285,10 +285,6 @@ def test_general_exception_handling():
         assert result is None
 
 
-# Подключаем модуль, где находятся функции
-from src.reader_csv_exel_file import file_path_csv, file_path_exel
-
-
 # Фикстуры для теста CSV
 @pytest.fixture
 def mock_csv_file():
@@ -337,7 +333,7 @@ def test_general_exception_handling_csv():
 
 
 # Тесты для функции file_path_exel
-def test_file_path_exel(mock_excel_file):
+def test_file_path_exe(mock_excel_file):
     """Тестирует успешное чтение Excel файла"""
     with patch("pandas.read_excel", return_value=mock_excel_file) as mock_read_excel:
         expected_output = [
