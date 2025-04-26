@@ -24,10 +24,16 @@
 #     )
 # )
 from src.external_api import convert_currency
-from src.generators import transaction_descriptions
 from src.processing import filter_by_state, sort_by_date
-from src.reader_csv_exel_file import file_path_csv, file_path_exel
+from src.reader_csv_exel_file import (
+    file_path_csv,
+    file_path_exel,
+    find_transactions,
+    count_operations_by_descriptions,
+    count_operations_by_description,
+)
 from src.utils import fin_transaction
+from src.widget import get_date, mask_account_card
 
 
 def main_logic():
@@ -82,12 +88,25 @@ def main_logic():
     print("Программа: Отфильтровать список транзакций по определенному слову в описании? Да/Нет")
     user_description = input().lower()
     if user_description == "да":
-        object_data = transaction_descriptions(object_data)
-        print(f"Программа: Распечатываю итоговый список транзакций {list(object_data)}")
+        print(f"Введите слово для фильтрации")
+        filter_name = input()
+        object_data = find_transactions(object_data, filter_name)
+        categories = count_operations_by_description(object_data, filter_name)
+        total_operations = count_operations_by_descriptions(object_data, categories)
+        print(f"Всего банковских операций в выборке {sum(total_operations.values())}")
     else:
-        print(f"Программа: Распечатываю итоговый список транзакций {object_data}")
+        print(f"Всего банковских операций в выборке {len(object_data)}")
 
-    print(f"Всего банковских операций в выборке ")
+    print(f"Программа: Распечатываю итоговый список транзакций")
+    for objects in object_data:
+        print(f"{get_date(objects.get('date'))} {objects.get('description')}")
+        if objects.get("description") == "Открытие вклада":
+            print(f"{mask_account_card(objects.get('to'))}")
+        else:
+            print(f"{mask_account_card(objects.get('from'))} -> {mask_account_card(objects.get('to'))}")
+        print(
+            f"Сумма: {objects.get('operationAmount').get('amount')} {objects.get('operationAmount').get('currency').get('name')}\n"
+        )
 
 
 if __name__ == "__main__":

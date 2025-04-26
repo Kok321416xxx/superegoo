@@ -27,7 +27,6 @@ def get_transaction_amount_in_rubles(transaction: float) -> float:
 def convert_currency(amount: str, from_curency: str) -> float:
     """
     Функция для конвертации суммы из одной валюты в другую через API
-    нужно было делать через try и exept, но как успел, может потом переделаю
     """
     headers = {"apikey": API_KEY}
     try:

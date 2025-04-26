@@ -85,7 +85,7 @@ def count_operations_by_description(dickt_list_ex_cs_js: list[dict], find_str: s
     finder_dickt = []
     for dick in dickt_list_ex_cs_js:
         if dick.get("description") and pattern.search(dick.get("description")):
-            finder_dickt.append(dick)
+            finder_dickt.append(dick.get("description"))
     return finder_dickt
 
 
@@ -96,12 +96,14 @@ def count_operations_by_descriptions(operations: list[dict], categories_1: list[
     Категория определяется по полю 'description'.
     """
     category_counts = Counter()
-    descriptions = [trans.get("description", "").lower() for trans in operations]
-    for category in categories_1:
-        category_lower = category.lower()
-        category_counts[category] = sum(1 for desc in descriptions if category_lower in desc)
 
-    return dict(category_counts)
+    for category in categories_1:
+        category_counts[category] = sum(
+            1 for trans in operations if category.lower() in trans.get("description").lower()
+        )
+
+    return category_counts
+
 
 # result = count_operations_by_description(o, categories)
 # print(result)
